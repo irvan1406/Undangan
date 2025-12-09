@@ -105,12 +105,40 @@
         }
 
         .copy-btn:active { transform: scale(0.95); }
+
+        /* Animasi Putar Musik Slow */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 4s linear infinite;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-4 gap-8">
+<body class="min-h-screen flex flex-col items-center p-4 gap-8 pb-24">
 
     <!-- Animasi Latar Belakang -->
     <canvas id="canvas-bg"></canvas>
+
+    <!-- TOMBOL MUSIK MELAYANG -->
+    <button id="musicBtn" onclick="toggleMusic()" class="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full border-2 border-[#d4af37] bg-black bg-opacity-80 flex items-center justify-center shadow-[0_0_15px_#d4af37] transition-all hover:scale-110">
+        <i id="musicIcon" class="fa-solid fa-compact-disc text-[#d4af37] text-2xl"></i>
+    </button>
+    
+    <!-- 
+    ========================================================================
+    PENTING: GANTI FILE MUSIK DI SINI
+    1. Siapkan file mp3 Anda
+    2. Ubah nama file mp3 Anda menjadi "musik-pernikahan.mp3"
+    3. Simpan file mp3 tersebut SATU FOLDER dengan file HTML ini
+    ========================================================================
+    -->
+    <audio id="bgMusic" loop>
+        <source src="musik.mp3" type="audio/mp3">
+        <!-- Cadangan jika file tidak ada (pakai link online) -->
+        <source src="" type="audio/mp3">
+    </audio>
 
     <!-- SLIDE 1: HALAMAN UTAMA -->
     <section class="w-full max-w-md fade-in-up visible">
@@ -118,7 +146,6 @@
             
             <div class="mt-2 mb-6 relative z-10">
                 <p class="uppercase tracking-[0.4em] text-[10px] text-gray-400 mb-4 font-serif-title">The Wedding Of</p>
-                <!-- NAMA DIBALIK -->
                 <h1 id="coupleNameDisplay" class="font-cali text-6xl md:text-7xl text-gold mb-4 py-2 leading-tight drop-shadow-lg">
                     Warda & Irvan
                 </h1>
@@ -175,7 +202,7 @@
         </div>
     </section>
 
-    <!-- SLIDE 2: MEMPELAI (Posisi Dibalik) -->
+    <!-- SLIDE 2: MEMPELAI -->
     <section class="w-full max-w-md fade-in-up">
         <div class="glass-card rounded-3xl p-8 relative text-center border-t-2 border-b-2 border-gold">
             
@@ -184,7 +211,7 @@
                 "Dengan memohon Rahmat dan Ridho Allah SWT, kami bermaksud menyelenggarakan Akad Nikah putra-putri kami:"
             </p>
 
-            <!-- PENGANTIN WANITA (Dulu) -->
+            <!-- PENGANTIN WANITA -->
             <div class="mb-6 relative">
                 <h1 class="font-cali text-4xl text-gold mb-2 drop-shadow-md">Ananda Wardana Rohma</h1>
                 <div class="flex flex-col items-center gap-1">
@@ -197,7 +224,7 @@
             <!-- DAN -->
             <div class="font-cali text-4xl text-[#d4af37] opacity-70 my-6 animate-pulse">&</div>
 
-            <!-- PENGANTIN PRIA (Kedua) -->
+            <!-- PENGANTIN PRIA -->
             <div class="mb-6 relative">
                 <h1 class="font-cali text-4xl text-gold mb-2 drop-shadow-md">Irvan Maulana</h1>
                 <div class="flex flex-col items-center gap-1">
@@ -252,7 +279,7 @@
         </div>
     </section>
 
-    <!-- SLIDE 4: PENUTUP & AKSI (Sekarang Diatas Ucapan) -->
+    <!-- SLIDE 4: PENUTUP & AKSI -->
     <section class="w-full max-w-md fade-in-up">
         <div class="glass-card rounded-3xl p-8 relative text-center border-t-2 border-b-2 border-gold">
             <div class="mb-8">
@@ -279,8 +306,8 @@
         </div>
     </section>
 
-    <!-- SLIDE 5: UCAPAN & DOA (KOMENTAR) - Paling Bawah -->
-    <section class="w-full max-w-md fade-in-up pb-10">
+    <!-- SLIDE 5: UCAPAN & DOA (KOMENTAR) -->
+    <section class="w-full max-w-md fade-in-up pb-5">
         <div class="glass-card rounded-3xl p-6 relative border-t-2 border-b-2 border-gold">
             <h2 class="font-cali text-3xl text-gold mb-4 text-center">Ucapan & Doa</h2>
             
@@ -312,27 +339,42 @@
         </div>
     </section>
 
-    <!-- 
-    ========================================
-             MODALS
-    ========================================
-    -->
+    <!-- ADMIN: GENERATOR LINK -->
+    <section class="w-full max-w-md fade-in-up pb-10">
+        <div class="border border-gray-800 rounded-lg p-4 bg-gray-900 bg-opacity-80">
+            <button onclick="document.getElementById('generatorArea').classList.toggle('hidden')" class="flex items-center justify-between w-full text-gray-500 hover:text-[#d4af37] transition text-xs uppercase tracking-widest">
+                <span><i class="fa-solid fa-link mr-2"></i>Buat Link Tamu</span>
+                <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            
+            <div id="generatorArea" class="hidden mt-4 space-y-2">
+                <p class="text-[10px] text-gray-400">Ketik nama tamu di bawah untuk membuat link khusus:</p>
+                <input type="text" id="generatorInput" placeholder="Contoh: Paman Budi" class="custom-input w-full px-3 py-2 rounded text-sm">
+                
+                <div class="flex gap-2">
+                    <button onclick="generateLink('copy')" class="flex-1 py-2 bg-gray-700 hover:bg-[#d4af37] hover:text-black text-gray-300 rounded text-xs font-bold transition">
+                        <i class="fa-regular fa-copy mr-1"></i> Salin Link
+                    </button>
+                    <button onclick="generateLink('wa')" class="flex-1 py-2 bg-[#25D366] hover:bg-[#128C7E] text-white rounded text-xs font-bold transition">
+                        <i class="fa-brands fa-whatsapp mr-1"></i> Kirim WA
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <!-- Modal RSVP (DIPERBARUI DENGAN FORM) -->
+    <!-- MODALS (RSVP & Gift) -->
     <div id="rsvpModal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-4">
         <div class="glass-card w-full max-w-sm rounded-2xl p-6 relative border border-gold transform scale-95 transition-transform duration-200">
             <button onclick="closeRSVPModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white">
                 <i class="fa-solid fa-times text-xl"></i>
             </button>
-            
             <h3 class="font-serif-title text-[#d4af37] text-lg mb-4 font-bold text-center">Formulir Kehadiran</h3>
-            
             <div class="space-y-4">
                 <div>
                     <label class="text-[10px] uppercase text-gray-400 block mb-1">Nama Tamu</label>
                     <input type="text" id="rsvpName" placeholder="Nama Anda" class="custom-input w-full px-3 py-2 rounded text-sm">
                 </div>
-                
                 <div>
                     <label class="text-[10px] uppercase text-gray-400 block mb-1">Jumlah Hadir</label>
                     <select id="rsvpCount" class="custom-select w-full px-3 py-2 rounded text-sm bg-black">
@@ -341,7 +383,6 @@
                         <option value="Tidak Hadir">Maaf, Tidak Bisa Hadir</option>
                     </select>
                 </div>
-
                 <div class="pt-2">
                     <p class="text-[10px] text-gray-500 mb-2 text-center">Konfirmasi via WhatsApp:</p>
                     <div class="grid grid-cols-2 gap-2">
@@ -357,20 +398,14 @@
         </div>
     </div>
 
-    <!-- Modal Gift -->
     <div id="giftModal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-4">
         <div class="glass-card w-full max-w-sm rounded-2xl p-6 relative border border-gold transform scale-95 transition-transform duration-200">
             <button onclick="closeGiftModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white">
                 <i class="fa-solid fa-times text-xl"></i>
             </button>
-            
             <h3 class="font-serif-title text-[#d4af37] text-lg mb-4 font-bold text-center">Wedding Gift</h3>
-            <p class="text-xs text-gray-400 text-center mb-6 px-4 leading-relaxed">
-                Tanpa mengurangi rasa hormat, bagi yang ingin memberikan tanda kasih:
-            </p>
-
+            <p class="text-xs text-gray-400 text-center mb-6 px-4 leading-relaxed">Tanpa mengurangi rasa hormat, bagi yang ingin memberikan tanda kasih:</p>
             <div class="space-y-4">
-                <!-- Rekening 2: Ananda (Sekarang Diatas) -->
                 <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg border border-gray-700">
                     <div class="flex items-center gap-3 mb-2">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/BANK_BRI_logo.svg/1200px-BANK_BRI_logo.svg.png" class="h-5 w-auto bg-white p-0.5 rounded" alt="BRI">
@@ -378,14 +413,10 @@
                     </div>
                     <div class="flex justify-between items-center mb-1">
                         <p class="text-white text-sm md:text-base font-mono tracking-wider">613901023317534</p>
-                        <button onclick="copyToClipboard('613901023317534')" class="copy-btn text-[10px] text-gray-900 font-bold bg-[#d4af37] hover:bg-[#fcf6ba] px-3 py-1.5 rounded transition">
-                            <i class="fa-regular fa-copy"></i> SALIN
-                        </button>
+                        <button onclick="copyToClipboard('613901023317534')" class="copy-btn text-[10px] text-gray-900 font-bold bg-[#d4af37] hover:bg-[#fcf6ba] px-3 py-1.5 rounded transition"><i class="fa-regular fa-copy"></i> SALIN</button>
                     </div>
                     <p class="text-xs text-gray-400 uppercase">a.n Ananda Wardana Rohma</p>
                 </div>
-
-                <!-- Rekening 1: Irvan (Sekarang Dibawah) -->
                 <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg border border-gray-700">
                     <div class="flex items-center gap-3 mb-2">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/BANK_BRI_logo.svg/1200px-BANK_BRI_logo.svg.png" class="h-5 w-auto bg-white p-0.5 rounded" alt="BRI">
@@ -393,9 +424,7 @@
                     </div>
                     <div class="flex justify-between items-center mb-1">
                         <p class="text-white text-sm md:text-base font-mono tracking-wider">611901029752532</p>
-                        <button onclick="copyToClipboard('611901029752532')" class="copy-btn text-[10px] text-gray-900 font-bold bg-[#d4af37] hover:bg-[#fcf6ba] px-3 py-1.5 rounded transition">
-                            <i class="fa-regular fa-copy"></i> SALIN
-                        </button>
+                        <button onclick="copyToClipboard('611901029752532')" class="copy-btn text-[10px] text-gray-900 font-bold bg-[#d4af37] hover:bg-[#fcf6ba] px-3 py-1.5 rounded transition"><i class="fa-regular fa-copy"></i> SALIN</button>
                     </div>
                     <p class="text-xs text-gray-400 uppercase">a.n Irvan Maulana</p>
                 </div>
@@ -403,7 +432,7 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast -->
     <div id="toast" class="fixed top-10 left-1/2 transform -translate-x-1/2 bg-[#d4af37] text-black font-bold px-6 py-3 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.5)] opacity-0 transition-all duration-500 pointer-events-none z-[60] text-sm translate-y-[-20px]">
         Berhasil!
     </div>
@@ -427,21 +456,42 @@
             rsvpCountInput: document.getElementById('rsvpCount')
         };
 
-        // 1. COUNTDOWN
+        // --- MUSIK ---
+        const music = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        const musicIcon = document.getElementById('musicIcon');
+        let isPlaying = false;
+
+        function toggleMusic() {
+            if (isPlaying) {
+                music.pause();
+                musicIcon.classList.remove('animate-spin-slow');
+                musicBtn.style.opacity = "0.7";
+            } else {
+                music.play();
+                musicIcon.classList.add('animate-spin-slow');
+                musicBtn.style.opacity = "1";
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // Script untuk mencoba autoplay saat user menyentuh layar pertama kali
+        document.body.addEventListener('click', function() {
+            if (!isPlaying) {
+                toggleMusic();
+            }
+        }, { once: true }); // Hanya jalan sekali
+
+        // --- COUNTDOWN ---
         function startCountdown() {
             const interval = setInterval(() => {
                 const now = new Date().getTime();
                 const distance = targetDate.getTime() - now;
-
                 if (distance < 0) {
                     clearInterval(interval);
-                    document.getElementById('countdownContainer').innerHTML = `
-                        <div class="col-span-4 p-4 text-center rounded-lg border border-[#d4af37] bg-[#d4af37] bg-opacity-20">
-                            <p class="text-[#d4af37] font-bold font-serif-title animate-pulse">Akad Nikah Sedang Berlangsung</p>
-                        </div>`;
+                    document.getElementById('countdownContainer').innerHTML = `<div class="col-span-4 p-4 text-center rounded-lg border border-[#d4af37] bg-[#d4af37] bg-opacity-20"><p class="text-[#d4af37] font-bold font-serif-title animate-pulse">Akad Nikah Sedang Berlangsung</p></div>`;
                     return;
                 }
-
                 els.days.innerText = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0');
                 els.hours.innerText = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
                 els.minutes.innerText = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
@@ -449,171 +499,98 @@
             }, 1000);
         }
 
-        // 2. MODAL FUNCTIONS
+        // --- MODALS ---
         function openRSVPModal() { els.rsvpModal.classList.remove('hidden'); }
         function closeRSVPModal() { els.rsvpModal.classList.add('hidden'); }
         function openGiftModal() { els.giftModal.classList.remove('hidden'); }
         function closeGiftModal() { els.giftModal.classList.add('hidden'); }
 
-        // 3. LOGIKA RSVP & WA
+        // --- RSVP & WA ---
         function sendRSVP(number, adminName) {
             const name = els.rsvpNameInput.value.trim();
             const count = els.rsvpCountInput.value;
-            
             if(!name) { showToast("Mohon isi nama Anda"); return; }
-
             const message = `Halo ${adminName}, saya *${name}* mengonfirmasi kehadiran untuk acara Akad Nikah Warda & Irvan.\n\nStatus: ${count}`;
             window.open(`https://wa.me/${number}?text=${encodeURIComponent(message)}`, '_blank');
             closeRSVPModal();
         }
 
-        // 4. LOGIKA UCAPAN (LOCALSTORAGE)
+        // --- UCAPAN (LOCALSTORAGE) ---
         function loadWishes() {
             const storedWishes = JSON.parse(localStorage.getItem('weddingWishes')) || [];
             storedWishes.forEach(wish => renderWish(wish.name, wish.message));
         }
-
         function submitWish() {
             const name = els.wishName.value.trim();
             const message = els.wishMessage.value.trim();
-
-            if (!name || !message) {
-                showToast("Mohon isi nama & ucapan");
-                return;
-            }
-
+            if (!name || !message) { showToast("Mohon isi nama & ucapan"); return; }
             renderWish(name, message);
-            
-            // Simpan ke LocalStorage
             const storedWishes = JSON.parse(localStorage.getItem('weddingWishes')) || [];
             storedWishes.push({ name, message });
             localStorage.setItem('weddingWishes', JSON.stringify(storedWishes));
-
-            els.wishName.value = '';
-            els.wishMessage.value = '';
+            els.wishName.value = ''; els.wishMessage.value = '';
             showToast("Ucapan terkirim!");
         }
-
         function renderWish(name, message) {
             const div = document.createElement('div');
             div.className = "bg-gray-800 bg-opacity-50 p-3 rounded-lg border border-gray-700 animate-pulse";
-            div.style.animation = "none"; // Hapus pulse setelah render
-            div.innerHTML = `
-                <div class="flex justify-between items-start mb-1">
-                    <span class="text-[#d4af37] font-bold text-xs">${sanitize(name)}</span>
-                    <span class="text-[9px] text-gray-500">Baru saja</span>
-                </div>
-                <p class="text-xs text-gray-300">${sanitize(message)}</p>
-            `;
-            // Insert after the first child (Admin comment) or prepend
-            if(els.wishesContainer.children.length > 0) {
-                 els.wishesContainer.insertBefore(div, els.wishesContainer.children[1]); // Keep Admin sticky or move down
-            } else {
-                 els.wishesContainer.appendChild(div);
-            }
+            div.style.animation = "none";
+            div.innerHTML = `<div class="flex justify-between items-start mb-1"><span class="text-[#d4af37] font-bold text-xs">${sanitize(name)}</span><span class="text-[9px] text-gray-500">Baru saja</span></div><p class="text-xs text-gray-300">${sanitize(message)}</p>`;
+            if(els.wishesContainer.children.length > 0) { els.wishesContainer.insertBefore(div, els.wishesContainer.children[1]); } else { els.wishesContainer.appendChild(div); }
         }
+        function sanitize(str) { const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; }
 
-        function sanitize(str) {
-            const temp = document.createElement('div');
-            temp.textContent = str;
-            return temp.innerHTML;
-        }
-
-        // 5. COPY & TOAST
+        // --- UTILS ---
         function copyToClipboard(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed";
-            textArea.style.left = "-9999px";
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                showToast("No. Rekening Tersalin!");
-            } catch (err) { showToast("Gagal menyalin."); }
-            document.body.removeChild(textArea);
+            const textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; textArea.style.left = "-9999px"; document.body.appendChild(textArea); textArea.select();
+            try { document.execCommand('copy'); showToast("Berhasil disalin!"); } catch (err) { showToast("Gagal menyalin."); } document.body.removeChild(textArea);
         }
-
         function showToast(msg) {
-            els.toast.innerText = msg;
-            els.toast.classList.remove('opacity-0', 'translate-y-[-20px]');
-            els.toast.classList.add('opacity-100', 'translate-y-0');
-            setTimeout(() => {
-                els.toast.classList.remove('opacity-100', 'translate-y-0');
-                els.toast.classList.add('opacity-0', 'translate-y-[-20px]');
-            }, 3000);
+            els.toast.innerText = msg; els.toast.classList.remove('opacity-0', 'translate-y-[-20px]'); els.toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => { els.toast.classList.remove('opacity-100', 'translate-y-0'); els.toast.classList.add('opacity-0', 'translate-y-[-20px]'); }, 3000);
+        }
+        function generateLink(type) {
+            const inputName = document.getElementById('generatorInput').value.trim();
+            if(!inputName) { showToast("Ketik nama dulu!"); return; }
+            const baseUrl = window.location.href.split('?')[0]; const newUrl = `${baseUrl}?guest=${encodeURIComponent(inputName)}`;
+            if (type === 'copy') { copyToClipboard(newUrl); showToast(`Link untuk "${inputName}" disalin!`); } else if (type === 'wa') {
+                const waText = `Halo ${inputName},\n\nTanpa mengurangi rasa hormat, kami mengundang Anda untuk hadir di acara akad nikah kami.\n\nInfo lengkap: ${newUrl}\n\nMohon doa restunya. Terima kasih.`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(waText)}`, '_blank');
+            }
+            document.getElementById('generatorInput').value = '';
         }
 
-        // 6. ANIMASI BACKGROUND
-        const canvas = document.getElementById('canvas-bg');
-        const ctx = canvas.getContext('2d');
-        let particlesArray;
-
+        // --- BACKGROUND PARTICLES ---
+        const canvas = document.getElementById('canvas-bg'); const ctx = canvas.getContext('2d'); let particlesArray;
         function initParticles() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            particlesArray = [];
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight; particlesArray = [];
             let numberOfParticles = (canvas.height * canvas.width) / 9000;
             for (let i = 0; i < numberOfParticles; i++) {
-                particlesArray.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 2,
-                    speedX: (Math.random() * 1) - 0.5,
-                    speedY: (Math.random() * 1) - 0.5,
-                    color: Math.random() > 0.5 ? '#d4af37' : '#fcf6ba'
-                });
+                particlesArray.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, speedX: (Math.random() * 1) - 0.5, speedY: (Math.random() * 1) - 0.5, color: Math.random() > 0.5 ? '#d4af37' : '#fcf6ba' });
             }
         }
-
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = 0; i < particlesArray.length; i++) {
-                let p = particlesArray[i];
-                p.x += p.speedX;
-                p.y += p.speedY;
-                if (p.x > canvas.width) p.x = 0;
-                if (p.x < 0) p.x = canvas.width;
-                if (p.y > canvas.height) p.y = 0;
-                if (p.y < 0) p.y = canvas.height;
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
+                let p = particlesArray[i]; p.x += p.speedX; p.y += p.speedY;
+                if (p.x > canvas.width) p.x = 0; if (p.x < 0) p.x = canvas.width; if (p.y > canvas.height) p.y = 0; if (p.y < 0) p.y = canvas.height;
+                ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
             }
             requestAnimationFrame(animateParticles);
         }
 
-        // 7. OBSERVER
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('visible');
-            });
-        });
+        // --- INIT ---
+        const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); }); });
         document.querySelectorAll('.fade-in-up').forEach(s => observer.observe(s));
-
-        window.onclick = function(e) {
-            if (e.target == els.rsvpModal) closeRSVPModal();
-            if (e.target == els.giftModal) closeGiftModal();
-        }
-
+        window.onclick = function(e) { if (e.target == els.rsvpModal) closeRSVPModal(); if (e.target == els.giftModal) closeGiftModal(); }
         window.onload = function() {
-            initParticles();
-            animateParticles();
-            startCountdown();
-            loadWishes();
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const guest = urlParams.get('guest');
-            if(guest) {
-                document.getElementById('guestNameDisplay').innerText = guest;
-                els.rsvpNameInput.value = guest; // Auto fill RSVP name
-            }
+            initParticles(); animateParticles(); startCountdown(); loadWishes();
+            const urlParams = new URLSearchParams(window.location.search); const guest = urlParams.get('guest');
+            if(guest) { document.getElementById('guestNameDisplay').innerText = guest; els.rsvpNameInput.value = guest; }
         };
         window.addEventListener('resize', initParticles);
     </script>
 </body>
 </html>
-
 
 
