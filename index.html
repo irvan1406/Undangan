@@ -339,30 +339,6 @@
         </div>
     </section>
 
-    <!-- ADMIN: GENERATOR LINK -->
-    <section class="w-full max-w-md fade-in-up pb-10">
-        <div class="border border-gray-800 rounded-lg p-4 bg-gray-900 bg-opacity-80">
-            <button onclick="document.getElementById('generatorArea').classList.toggle('hidden')" class="flex items-center justify-between w-full text-gray-500 hover:text-[#d4af37] transition text-xs uppercase tracking-widest">
-                <span><i class="fa-solid fa-link mr-2"></i>Buat Link Tamu</span>
-                <i class="fa-solid fa-chevron-down"></i>
-            </button>
-            
-            <div id="generatorArea" class="hidden mt-4 space-y-2">
-                <p class="text-[10px] text-gray-400">Ketik nama tamu di bawah untuk membuat link khusus:</p>
-                <input type="text" id="generatorInput" placeholder="Contoh: Paman Budi" class="custom-input w-full px-3 py-2 rounded text-sm">
-                
-                <div class="flex gap-2">
-                    <button onclick="generateLink('copy')" class="flex-1 py-2 bg-gray-700 hover:bg-[#d4af37] hover:text-black text-gray-300 rounded text-xs font-bold transition">
-                        <i class="fa-regular fa-copy mr-1"></i> Salin Link
-                    </button>
-                    <button onclick="generateLink('wa')" class="flex-1 py-2 bg-[#25D366] hover:bg-[#128C7E] text-white rounded text-xs font-bold transition">
-                        <i class="fa-brands fa-whatsapp mr-1"></i> Kirim WA
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- MODALS (RSVP & Gift) -->
     <div id="rsvpModal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-4">
         <div class="glass-card w-full max-w-sm rounded-2xl p-6 relative border border-gold transform scale-95 transition-transform duration-200">
