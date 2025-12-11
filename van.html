@@ -594,6 +594,47 @@
         };
         window.onresize = initParticles;
     </script>
+<!-- 
+  MASUKKAN KODE INI DI DALAM FILE index.html
+  Letakkan di bagian paling bawah, tepat DI ATAS tag </body> 
+-->
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Cari elemen tempat menaruh nama tamu (pastikan ID nya sesuai, misal 'nama-tamu')
+    const elemenNama = document.querySelector("#nama-tamu") || document.querySelector(".nama-tamu");
+    const inputForm = document.querySelector("input[name='nama']"); // Jika ada form kehadiran
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let namaFinal = "Tamu Undangan"; // Default
+
+    // 1. Cek Link Rumit (Mode Enkripsi)
+    if (urlParams.has('invite')) {
+      try {
+        // Decode dari kode acak kembali ke teks biasa
+        const kodeRahasia = urlParams.get('invite');
+        namaFinal = atob(kodeRahasia); 
+      } catch (e) {
+        console.log("Kode tidak valid");
+      }
+    } 
+    // 2. Cek Link Biasa (Mode Lama)
+    else if (urlParams.has('guest')) {
+      namaFinal = urlParams.get('guest');
+    }
+
+    // Tampilkan Nama
+    if (elemenNama) {
+      elemenNama.innerText = namaFinal;
+    }
+    
+    // Isi otomatis di form RSVP (jika ada)
+    if (inputForm) {
+      inputForm.value = namaFinal;
+    }
+  });
+</script>
+
 </body>
 </html>
 
