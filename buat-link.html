@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Link Undangan</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 400px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, button, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: #25D366; color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { background: #128C7E; }
+        .result { display: none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
+        label { font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px; }
+        .preview { background: #eee; padding: 10px; font-size: 12px; font-family: monospace; word-break: break-all; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align:center; color:#075E54;">Buat Link Undangan</h2>
+    
+    <label>Nama Tamu:</label>
+    <input type="text" id="inputNama" placeholder="Contoh: Budi Santoso" onkeyup="buatLink()">
+    
+    <div id="hasilArea" class="result">
+        <label>Link Rumit (Encrypted):</label>
+        <div class="preview" id="linkPreview">...</div>
+        
+        <br>
+        <label>Template Pesan WhatsApp:</label>
+        <textarea id="pesanWA" rows="8"></textarea>
+        
+        <button onclick="copyTeks()">SALIN PESAN (COPY)</button>
+        <a id="btnKirimWA" href="#" target="_blank" style="display:block; text-align:center; margin-top:10px; text-decoration:none; color:#25D366;">Langsung Kirim ke WA ></a>
+    </div>
+</div>
+
+<script>
+    // KONFIGURASI: Ganti dengan domain Anda
+    const BASE_URL = "https://irvan-warda.my.id/";
+
+    function buatLink() {
+        const nama = document.getElementById('inputNama').value.trim();
+        const hasilArea = document.getElementById('hasilArea');
+        
+        if(nama.length === 0) {
+            hasilArea.style.display = 'none';
+            return;
+        }
+
+        // INTI RAHASIA: Mengubah Teks jadi Base64
+        const kodeRahasia = btoa(nama);
+        const linkFinal = BASE_URL + "?invite=" + kodeRahasia;
+
+        // Update Tampilan
+        hasilArea.style.display = 'block';
+        document.getElementById('linkPreview').innerText = linkFinal;
+
+        // Template Pesan
+        const pesan = `*UNDANGAN PERNIKAHAN DIGITAL*\nIrvan & Warda\n\nKepada Yth.\n*${nama}*\n\nSilakan akses undangan resmi Anda melalui link di bawah ini:\n🔗 ${linkFinal}\n\n_Mohon untuk tidak membagikan link ini._`;
+        
+        document.getElementById('pesanWA').value = pesan;
+
+        // Update tombol kirim langsung (Opsional)
+        document.getElementById('btnKirimWA').href = "https://wa.me/?text=" + encodeURIComponent(pesan);
+    }
+
+    function copyTeks() {
+        const teks = document.getElementById('pesanWA');
+        teks.select();
+        teks.setSelectionRange(0, 99999); // Untuk HP
+        navigator.clipboard.writeText(teks.value);
+        alert("Pesan berhasil disalin! Silakan paste di WhatsApp.");
+    }
+</script>
+
+</body>
+</html>
+
