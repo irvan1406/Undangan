@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generator Link Undangan</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    padding: 20px;
+}
+.box {
+    max-width: 420px;
+    margin: auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.1);
+}
+h2 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+input, textarea, button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    font-size: 14px;
+}
+textarea {
+    height: 170px;
+}
+button {
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.btn-generate {
+    background: #4CAF50;
+    color: #fff;
+}
+.btn-copy {
+    background: #333;
+    color: #fff;
+}
+.btn-wa {
+    background: #25D366;
+    color: #fff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>Generator Link Undangan</h2>
+
+    <input type="text" id="nama" placeholder="Nama tamu (contoh: Bapak Andi)">
+
+    <button class="btn-generate" onclick="generateLink()">Generate</button>
+
+    <textarea id="hasil" placeholder="Pesan undangan akan muncul di sini"></textarea>
+
+    <button class="btn-copy" onclick="copyText()">Salin Pesan</button>
+    <button class="btn-wa" onclick="sendWA()">Kirim via WhatsApp</button>
+</div>
+
+<script>
+const UNDANGAN_URL = "https://irvan-warda.my.id/pria.html";
+
+function generateLink() {
+    const nama = document.getElementById("nama").value.trim();
+    if (!nama) {
+        alert("Nama tamu tidak boleh kosong");
+        return;
+    }
+
+    const encoded = btoa(nama);
+    const link = `${UNDANGAN_URL}?invite=${encoded}`;
+
+    const pesan = `Assalamu’alaikum 🙏
+Dengan penuh rasa syukur, kami mengundang keluarga untuk hadir di acara pernikahan kami.
+Berikut link undangan online kami:
+👉 ${link}
+Besar harapan kami bisa bertemu dan bersilaturahmi. Terima kasih 🤗`;
+
+    document.getElementById("hasil").value = pesan;
+}
+
+function copyText() {
+    const text = document.getElementById("hasil");
+    text.select();
+    document.execCommand("copy");
+    alert("Pesan berhasil disalin");
+}
+
+function sendWA() {
+    const pesan = document.getElementById("hasil").value;
+    if (!pesan) {
+        alert("Generate pesan terlebih dahulu");
+        return;
+    }
+    const waUrl = "https://wa.me/?text=" + encodeURIComponent(pesan);
+    window.open(waUrl, "_blank");
+}
+</script>
+
+</body>
+</html>
