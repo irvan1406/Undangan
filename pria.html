@@ -535,21 +535,21 @@
         }
 
         window.onload = () => {
-            initParticles(); animateParticles(); startCountdown(); loadWishes();
-            const params = new URLSearchParams(window.location.search);
-            const invite = params.get('invite');
-if (invite) {
-    try {
-        const guest = atob(invite);
-        els.guestNameDisplay.innerText = guest;
-        els.coverGuestName.innerText = guest;
-        els.rsvpName.value = guest;
-    } catch (e) {
-        console.log("Invite tidak valid");
-    }
-        }
+    initParticles();
+    animateParticles();
+    startCountdown();
+    loadWishes();
+
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
             }
-            const obs = new IntersectionObserver(ents => ents.forEach(e => {
+        });
+    });
+
+    document.querySelectorAll('.fade-in-up').forEach(el => obs.observe(el));
+};
+
+window.onresize = initParticles;
                 if(e.isIntersecting) e.target.classList.add('visible');
             }));
             document.querySelectorAll('.fade-in-up').forEach(el => obs.observe(el));
