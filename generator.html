@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -12,16 +13,15 @@ body {
     padding: 20px;
 }
 .box {
-    max-width: 420px;
+    max-width: 460px;
     margin: auto;
-    background: #ffffff;
+    background: #fff;
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 14px;
     box-shadow: 0 10px 25px rgba(0,0,0,.1);
 }
 h2 {
     text-align: center;
-    margin-bottom: 15px;
 }
 input, textarea, button {
     width: 100%;
@@ -29,25 +29,34 @@ input, textarea, button {
     padding: 12px;
     font-size: 14px;
 }
-textarea {
-    height: 170px;
-}
+textarea { height: 170px; }
 button {
     border: none;
     border-radius: 6px;
     cursor: pointer;
 }
-.btn-generate {
-    background: #4CAF50;
-    color: #fff;
+.btn-copy { background:#333;color:#fff }
+.btn-wa { background:#25D366;color:#fff }
+.btn-link { background:#007bff;color:#fff }
+
+.preview, .history {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #555;
 }
-.btn-copy {
-    background: #333;
-    color: #fff;
+.history span {
+    display: inline-block;
+    background: #eee;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin: 4px 4px 0 0;
+    cursor: pointer;
 }
-.btn-wa {
-    background: #25D366;
-    color: #fff;
+.counter {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #888;
 }
 </style>
 </head>
@@ -55,55 +64,116 @@ button {
 <body>
 
 <div class="box">
-    <h2>Generator Link Undangan</h2>
+<h2>Generator Link Undangan</h2>
 
-    <input type="text" id="nama" placeholder="Nama tamu (contoh: Bapak Andi)">
+<input type="text" id="nama" placeholder="Ketik nama tamu" oninput="autoGenerate()">
 
-    <button class="btn-generate" onclick="generateLink()">Generate</button>
+<div class="preview" id="preview"></div>
 
-    <textarea id="hasil" placeholder="Pesan undangan akan muncul di sini"></textarea>
+<textarea id="hasil" placeholder="Pesan otomatis muncul di sini"></textarea>
 
-    <button class="btn-copy" onclick="copyText()">Salin Pesan</button>
-    <button class="btn-wa" onclick="sendWA()">Kirim via WhatsApp</button>
+<button class="btn-copy" onclick="copyText()">Salin Pesan</button>
+<button class="btn-link" onclick="copyLink()">Salin Link Saja</button>
+<button class="btn-wa" onclick="sendWA()">Kirim via WhatsApp</button>
+
+<div class="history" id="history"></div>
+<div class="counter" id="counter"></div>
 </div>
 
 <script>
 const UNDANGAN_URL = "https://irvan-warda.my.id/pria.html";
+let sentCount = Number(localStorage.getItem("sentCount")) || 0;
 
-function generateLink() {
-    const nama = document.getElementById("nama").value.trim();
+updateCounter();
+loadHistory();
+
+function cleanName(name) {
+    return name.replace(/\s+/g, " ").trim();
+}
+
+function autoGenerate() {
+    let nama = cleanName(document.getElementById("nama").value);
+    const hasil = document.getElementById("hasil");
+    const preview = document.getElementById("preview");
+
     if (!nama) {
-        alert("Nama tamu tidak boleh kosong");
+        hasil.value = "";
+        preview.innerHTML = "";
         return;
     }
 
     const encoded = btoa(nama);
     const link = `${UNDANGAN_URL}?invite=${encoded}`;
 
-    const pesan = `Assalamu’alaikum 🙏
+    preview.innerHTML = `Preview nama tamu: <b>${nama}</b>`;
+
+    hasil.value = `Assalamu’alaikum 🙏
 Dengan penuh rasa syukur, kami mengundang keluarga untuk hadir di acara pernikahan kami.
 Berikut link undangan online kami:
 👉 ${link}
 Besar harapan kami bisa bertemu dan bersilaturahmi. Terima kasih 🤗`;
 
-    document.getElementById("hasil").value = pesan;
+    saveHistory(nama);
 }
 
 function copyText() {
     const text = document.getElementById("hasil");
+    if (!text.value) return alert("Nama belum diisi");
     text.select();
     document.execCommand("copy");
-    alert("Pesan berhasil disalin");
+    incrementCounter();
+    alert("Pesan disalin");
+}
+
+function copyLink() {
+    const pesan = document.getElementById("hasil").value;
+    if (!pesan) return alert("Nama belum diisi");
+    const link = pesan.match(/https:\/\/[^\s]+/)[0];
+    navigator.clipboard.writeText(link);
+    alert("Link disalin");
 }
 
 function sendWA() {
     const pesan = document.getElementById("hasil").value;
-    if (!pesan) {
-        alert("Generate pesan terlebih dahulu");
-        return;
+    if (!pesan) return alert("Nama belum diisi");
+    incrementCounter();
+    window.open("https://wa.me/?text=" + encodeURIComponent(pesan), "_blank");
+}
+
+function saveHistory(nama) {
+    let data = JSON.parse(localStorage.getItem("guestHistory")) || [];
+    if (!data.includes(nama)) {
+        data.unshift(nama);
+        data = data.slice(0, 10);
+        localStorage.setItem("guestHistory", JSON.stringify(data));
+        loadHistory();
     }
-    const waUrl = "https://wa.me/?text=" + encodeURIComponent(pesan);
-    window.open(waUrl, "_blank");
+}
+
+function loadHistory() {
+    const history = document.getElementById("history");
+    const data = JSON.parse(localStorage.getItem("guestHistory")) || [];
+    history.innerHTML = data.length ? "Riwayat:" : "";
+    data.forEach(n => {
+        const span = document.createElement("span");
+        span.innerText = n;
+        span.onclick = () => {
+            document.getElementById("nama").value = n;
+            autoGenerate();
+        };
+        history.appendChild(span);
+    });
+}
+
+function incrementCounter() {
+    sentCount++;
+    localStorage.setItem("sentCount", sentCount);
+    updateCounter();
+}
+
+function updateCounter() {
+    document.getElementById("counter").innerText =
+        `Total undangan dibuat: ${sentCount}`;
 }
 </script>
 
